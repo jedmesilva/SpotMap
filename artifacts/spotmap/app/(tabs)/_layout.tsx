@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
@@ -8,10 +9,9 @@ import {
 } from "expo-router/unstable-native-tabs";
 import { SymbolView } from "expo-symbols";
 import React from "react";
-import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Icon as AppIcon } from "@/components/Icon";
 import { Colors } from "@/constants/colors";
 
 function NativeTabLayout() {
@@ -73,7 +73,7 @@ function ClassicTabLayout() {
             Platform.OS === "ios" ? (
               <SymbolView name="map" tintColor={color} size={22} />
             ) : (
-              <AppIcon name="map" size={22} color={color} />
+              <Feather name="map" size={22} color={color} />
             ),
         }}
       />
@@ -85,7 +85,7 @@ function ClassicTabLayout() {
             Platform.OS === "ios" ? (
               <SymbolView name="person" tintColor={color} size={22} />
             ) : (
-              <AppIcon name="user" size={22} color={color} />
+              <Feather name="user" size={22} color={color} />
             ),
         }}
       />
