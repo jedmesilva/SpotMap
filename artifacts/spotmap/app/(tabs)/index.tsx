@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Location from "expo-location";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -11,6 +10,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Icon } from "@/components/Icon";
 import { MapContainer } from "@/components/MapContainer";
 import { SpotBottomSheet } from "@/components/SpotBottomSheet";
 import { Colors } from "@/constants/colors";
@@ -137,7 +137,7 @@ export default function MapScreen() {
   if (permission && !permission.granted && !permission.canAskAgain) {
     return (
       <View style={[styles.centered, { backgroundColor: Colors.background }]}>
-        <Ionicons name="location-outline" size={56} color={Colors.primary} />
+        <Icon name="location" size={56} color={Colors.primary} />
         <Text style={styles.permTitle}>Localização bloqueada</Text>
         <Text style={styles.permDesc}>
           Habilite a localização nas configurações do celular para encontrar
@@ -174,7 +174,7 @@ export default function MapScreen() {
               { transform: [{ scale: counterAnim }] },
             ]}
           >
-            <Ionicons name="flash" size={13} color={Colors.background} />
+            <Icon name="flash" size={13} color={Colors.background} />
             <Text style={styles.nearbyBadgeText}>{nearbyCount} perto!</Text>
           </Animated.View>
         )}

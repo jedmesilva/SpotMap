@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
+import { Icon } from "@/components/Icon";
 import { Colors } from "@/constants/colors";
 import type { Spot } from "@/types";
 
@@ -66,7 +67,7 @@ export function SpotMarker({ spot, isNearby, isCollected, onPress }: SpotMarkerP
     return (
       <View style={[styles.markerContainer, styles.collected]}>
         <View style={styles.markerInner}>
-          <Text style={styles.emoji}>✓</Text>
+          <Icon name="check" size={18} color={Colors.textMuted} />
         </View>
       </View>
     );
@@ -99,7 +100,7 @@ export function SpotMarker({ spot, isNearby, isCollected, onPress }: SpotMarkerP
       </View>
       {spot.rarity === "legendary" && (
         <View style={[styles.rarityBadge, { backgroundColor: Colors.accent }]}>
-          <Text style={styles.rarityText}>★</Text>
+          <Icon name="star-filled" size={8} color="#fff" />
         </View>
       )}
     </Animated.View>
@@ -154,10 +155,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-  },
-  rarityText: {
-    fontSize: 8,
-    color: "#fff",
-    fontWeight: "800",
   },
 });

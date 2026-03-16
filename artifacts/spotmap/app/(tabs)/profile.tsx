@@ -1,17 +1,16 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Icon, type IconName } from "@/components/Icon";
 import { Colors } from "@/constants/colors";
 import { useSpots } from "@/context/SpotsContext";
 import type { CollectedSpot } from "@/types";
@@ -23,13 +22,22 @@ const RARITY_COLORS: Record<string, string> = {
   legendary: Colors.accent,
 };
 
-const RANK_ICONS: Record<string, string> = {
-  Novato: "🌱",
-  Iniciante: "⭐",
-  Explorador: "🔥",
-  Caçador: "🏆",
-  Mestre: "💎",
-  Lendário: "👑",
+const RANK_ICONS: Record<string, IconName> = {
+  Novato: "leaf",
+  Iniciante: "star",
+  Explorador: "map",
+  Caçador: "trophy",
+  Mestre: "diamond",
+  Lendário: "crown",
+};
+
+const RANK_COLORS: Record<string, string> = {
+  Novato: Colors.accentGreen,
+  Iniciante: Colors.accentGold,
+  Explorador: Colors.primary,
+  Caçador: Colors.accent,
+  Mestre: "#00CFFF",
+  Lendário: Colors.accentGold,
 };
 
 function CollectedSpotCard({ spot }: { spot: CollectedSpot }) {
@@ -73,19 +81,19 @@ function CollectedSpotCard({ spot }: { spot: CollectedSpot }) {
 }
 
 function StatCard({
-  icon,
+  iconName,
   label,
   value,
   color,
 }: {
-  icon: string;
+  iconName: IconName;
   label: string;
   value: string;
   color: string;
 }) {
   return (
     <View style={[styles.statCard, { borderColor: `${color}30` }]}>
-      <Text style={styles.statIcon}>{icon}</Text>
+      <Icon name={iconName} size={20} color={color} />
       <Text style={[styles.statValue, { color }]}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
@@ -119,14 +127,15 @@ export default function ProfileScreen() {
     );
   };
 
-  const rankIcon = RANK_ICONS[userStats.rank] || "⭐";
+  const rankIconName: IconName = RANK_ICONS[userStats.rank] || "star";
+  const rankColor = RANK_COLORS[userStats.rank] || Colors.accentGold;
 
   return (
     <View style={[styles.container, { paddingTop: topInset }]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Meu Perfil</Text>
         <Pressable onPress={handleClearData} hitSlop={8}>
-          <Feather name="trash-2" size={20} color={Colors.textMuted} />
+          <Icon name="trash" size={20} color={Colors.textMuted} />
         </Pressable>
       </View>
 
@@ -141,32 +150,34 @@ export default function ProfileScreen() {
         ListHeaderComponent={
           <View>
             <View style={styles.rankBanner}>
-              <Text style={styles.rankEmoji}>{rankIcon}</Text>
+              <View style={[styles.rankIconBox, { backgroundColor: `${rankColor}22`, borderColor: `${rankColor}44` }]}>
+                <Icon name={rankIconName} size={28} color={rankColor} />
+              </View>
               <View>
                 <Text style={styles.rankLabel}>Seu nível</Text>
                 <Text style={styles.rankTitle}>{userStats.rank}</Text>
               </View>
               <View style={styles.streakBadge}>
-                <Ionicons name="flame" size={16} color={Colors.accent} />
+                <Icon name="flame" size={16} color={Colors.accent} />
                 <Text style={styles.streakText}>{userStats.streak}</Text>
               </View>
             </View>
 
             <View style={styles.statsGrid}>
               <StatCard
-                icon="🗺️"
+                iconName="map"
                 label="Coletados"
                 value={String(userStats.totalCollected)}
                 color={Colors.primary}
               />
               <StatCard
-                icon="🔥"
+                iconName="flash"
                 label="Sequência"
                 value={String(userStats.streak)}
                 color={Colors.accent}
               />
               <StatCard
-                icon="⭐"
+                iconName="star"
                 label="Nível"
                 value={userStats.rank}
                 color={Colors.accentGold}
@@ -197,11 +208,7 @@ export default function ProfileScreen() {
 
             {collectedSpots.length === 0 && (
               <View style={styles.emptyState}>
-                <Ionicons
-                  name="map-outline"
-                  size={56}
-                  color={Colors.textMuted}
-                />
+                <Icon name="map-outline" size={56} color={Colors.textMuted} />
                 <Text style={styles.emptyTitle}>Nenhum spot coletado</Text>
                 <Text style={styles.emptyDesc}>
                   Explore o mapa e chegue perto de um spot para coletá-lo!
@@ -261,8 +268,13 @@ const styles = StyleSheet.create({
     borderColor: Colors.cardBorder,
     marginBottom: 16,
   },
-  rankEmoji: {
-    fontSize: 40,
+  rankIconBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
   },
   rankLabel: {
     fontSize: 12,
@@ -307,9 +319,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     borderWidth: 1,
-  },
-  statIcon: {
-    fontSize: 20,
   },
   statValue: {
     fontSize: 18,

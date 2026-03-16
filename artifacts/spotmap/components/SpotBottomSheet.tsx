@@ -1,4 +1,3 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useRef } from "react";
 import {
@@ -13,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Icon } from "@/components/Icon";
 import { Colors } from "@/constants/colors";
 import type { Spot } from "@/types";
 
@@ -145,7 +145,7 @@ export function SpotBottomSheet({
             </Text>
           </View>
           <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={8}>
-            <Feather name="x" size={20} color={Colors.textSecondary} />
+            <Icon name="close" size={20} color={Colors.textSecondary} />
           </Pressable>
         </View>
 
@@ -167,26 +167,26 @@ export function SpotBottomSheet({
 
         {spot.brand && (
           <View style={styles.brandRow}>
-            <Feather name="tag" size={14} color={Colors.textMuted} />
+            <Icon name="tag" size={14} color={Colors.textMuted} />
             <Text style={styles.brandText}>{spot.brand}</Text>
           </View>
         )}
 
         <View style={styles.infoRow}>
           <View style={styles.infoCard}>
-            <Feather name="clock" size={14} color={Colors.textMuted} />
+            <Icon name="clock" size={14} color={Colors.textMuted} />
             <Text style={styles.infoLabel}>Expira</Text>
             <Text style={styles.infoValue}>
               {daysLeft > 0 ? `${daysLeft}d` : "Hoje"}
             </Text>
           </View>
           <View style={styles.infoCard}>
-            <Feather name="map-pin" size={14} color={Colors.textMuted} />
+            <Icon name="map-pin" size={14} color={Colors.textMuted} />
             <Text style={styles.infoLabel}>Raio</Text>
             <Text style={styles.infoValue}>{spot.radius}m</Text>
           </View>
           <View style={styles.infoCard}>
-            <Feather name="navigation" size={14} color={Colors.textMuted} />
+            <Icon name="navigation" size={14} color={Colors.textMuted} />
             <Text style={styles.infoLabel}>Distância</Text>
             <Text style={styles.infoValue}>
               {distance < 1000
@@ -198,7 +198,7 @@ export function SpotBottomSheet({
 
         {isCollected ? (
           <View style={[styles.collectBtn, styles.collectedBtn]}>
-            <Ionicons name="checkmark-circle" size={22} color={Colors.success} />
+            <Icon name="check-circle" size={22} color={Colors.success} />
             <Text style={[styles.collectBtnText, { color: Colors.success }]}>
               Coletado!
             </Text>
@@ -217,7 +217,7 @@ export function SpotBottomSheet({
               <Text style={styles.collectBtnText}>Coletando...</Text>
             ) : (
               <>
-                <Ionicons name="flash" size={22} color="#0A1020" />
+                <Icon name="flash" size={22} color="#0A1020" />
                 <Text style={[styles.collectBtnText, { color: "#0A1020" }]}>
                   Coletar Spot!
                 </Text>
@@ -226,7 +226,7 @@ export function SpotBottomSheet({
           </Pressable>
         ) : (
           <View style={styles.tooFarContainer}>
-            <Feather name="navigation" size={16} color={Colors.textMuted} />
+            <Icon name="navigation" size={16} color={Colors.textMuted} />
             <Text style={styles.tooFarText}>
               Você está a {distance < 1000 ? `${Math.round(distance)}m` : `${(distance / 1000).toFixed(1)}km`} do spot.{" "}
               Chegue dentro dos {spot.radius}m para coletar!
