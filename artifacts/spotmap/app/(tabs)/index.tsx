@@ -5,8 +5,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  Platform,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -20,6 +18,9 @@ import { useSpots } from "@/context/SpotsContext";
 import type { Spot } from "@/types";
 import { getDistance } from "@/utils/distance";
 
+const DEFAULT_LAT = -23.5505;
+const DEFAULT_LNG = -46.6333;
+
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const { nearbySpots, loadSpotsNearLocation, collectSpot, isCollected } =
@@ -32,6 +33,7 @@ export default function MapScreen() {
   } | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [locationRequested, setLocationRequested] = useState(false);
 
   const counterAnim = useRef(new Animated.Value(1)).current;
 
@@ -54,18 +56,26 @@ export default function MapScreen() {
   );
 
   useEffect(() => {
-    if (permission) initLocation();
+    if (permission && !locationRequested) {
+      initLocation();
+    }
   }, [permission]);
 
   const initLocation = async () => {
+    if (locationRequested) return;
+    setLocationRequested(true);
     if (!permission) return;
     let granted = permission.granted;
-    if (!granted) {
+    if (!granted && permission.canAskAgain) {
       const result = await requestPermission();
       granted = result.granted;
     }
-    if (granted) startWatchingLocation();
-    else setIsLoading(false);
+    if (granted) {
+      startWatchingLocation();
+    } else {
+      loadSpotsNearLocation(DEFAULT_LAT, DEFAULT_LNG);
+      setIsLoading(false);
+    }
   };
 
   const startWatchingLocation = async () => {
@@ -89,15 +99,14 @@ export default function MapScreen() {
         }
       );
     } catch {
+      loadSpotsNearLocation(DEFAULT_LAT, DEFAULT_LNG);
       setIsLoading(false);
     }
   };
 
   const handleSpotPress = (spot: Spot) => {
     setSelectedSpot(spot);
-    if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
   const handleCollect = async () => {
@@ -125,25 +134,15 @@ export default function MapScreen() {
     );
   }
 
-  if (!permission.granted) {
+  if (permission && !permission.granted && !permission.canAskAgain) {
     return (
       <View style={[styles.centered, { backgroundColor: Colors.background }]}>
         <Ionicons name="location-outline" size={56} color={Colors.primary} />
-        <Text style={styles.permTitle}>SpotMap precisa da sua localização</Text>
+        <Text style={styles.permTitle}>Localização bloqueada</Text>
         <Text style={styles.permDesc}>
-          Para encontrar spots próximos, precisamos de acesso à sua localização.
+          Habilite a localização nas configurações do celular para encontrar
+          spots perto de você.
         </Text>
-        {permission.canAskAgain && (
-          <Pressable
-            style={({ pressed }) => [
-              styles.permBtn,
-              { opacity: pressed ? 0.8 : 1 },
-            ]}
-            onPress={() => requestPermission()}
-          >
-            <Text style={styles.permBtnText}>Permitir Localização</Text>
-          </Pressable>
-        )}
       </View>
     );
   }
@@ -161,31 +160,25 @@ export default function MapScreen() {
         onSpotPress={handleSpotPress}
         isCollected={isCollected}
         isNearby={isSpotNearby}
-        onCenter={() => {
-          if (Platform.OS !== "web") {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }
-        }}
+        onCenter={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
       />
 
-      {Platform.OS !== "web" && (
-        <View style={[styles.topBar, { top: insets.top + 8 }]}>
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>SpotMap</Text>
-          </View>
-          {nearbyCount > 0 && (
-            <Animated.View
-              style={[
-                styles.nearbyBadge,
-                { transform: [{ scale: counterAnim }] },
-              ]}
-            >
-              <Ionicons name="flash" size={13} color={Colors.background} />
-              <Text style={styles.nearbyBadgeText}>{nearbyCount} perto!</Text>
-            </Animated.View>
-          )}
+      <View style={[styles.topBar, { top: insets.top + 8 }]}>
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoText}>SpotMap</Text>
         </View>
-      )}
+        {nearbyCount > 0 && (
+          <Animated.View
+            style={[
+              styles.nearbyBadge,
+              { transform: [{ scale: counterAnim }] },
+            ]}
+          >
+            <Ionicons name="flash" size={13} color={Colors.background} />
+            <Text style={styles.nearbyBadgeText}>{nearbyCount} perto!</Text>
+          </Animated.View>
+        )}
+      </View>
 
       <SpotBottomSheet
         spot={selectedSpot}
@@ -268,18 +261,5 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     textAlign: "center",
     lineHeight: 20,
-  },
-  permBtn: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 28,
-    paddingVertical: 14,
-    borderRadius: 14,
-    marginTop: 8,
-  },
-  permBtnText: {
-    color: Colors.background,
-    fontSize: 16,
-    fontWeight: "700",
-    fontFamily: "Inter_700Bold",
   },
 });
